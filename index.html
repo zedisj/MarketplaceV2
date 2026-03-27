@@ -3050,7 +3050,74 @@
 
   </style>
 </head>
-<body>
+<body><script>
+(function() {
+  var HASH = '7c4f8e2b9d1a5f3c6e0b8d2a4f6c1e9b3d5a7f2c4e8b0d6a1f3c5e7b9d2a4f';
+  function hashStr(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) {
+      h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+    }
+    return Math.abs(h).toString(16).padStart(8,'0');
+  }
+  var SESSION_KEY = 'zededa_mp_auth';
+  if (sessionStorage.getItem(SESSION_KEY) === '1') return;
+
+  // Build overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'auth-gate';
+  overlay.style.cssText = [
+    'position:fixed','inset:0','z-index:99999',
+    'background:#0C2028',
+    'display:flex','align-items:center','justify-content:center',
+    'font-family:Arial,sans-serif'
+  ].join(';');
+
+  overlay.innerHTML = [
+    '<div style="background:#133844;border:1px solid rgba(255,255,255,0.1);border-radius:16px;',
+    'padding:40px 44px;max-width:380px;width:90%;text-align:center;">',
+    '<div style="font-size:28px;margin-bottom:6px;">⚡</div>',
+    '<div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;">ZEDEDA Marketplace</div>',
+    '<div style="font-size:13px;color:#6b8fa3;margin-bottom:28px;">Enter password to continue</div>',
+    '<input id="gate-input" type="password" placeholder="Password"',
+    ' style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:8px;',
+    'border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);',
+    'color:#fff;font-size:14px;outline:none;margin-bottom:12px;" />',
+    '<div id="gate-err" style="color:#f87171;font-size:12px;min-height:18px;margin-bottom:8px;"></div>',
+    '<button id="gate-btn"',
+    ' style="width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;',
+    'background:linear-gradient(135deg,#FF5000,#cc3a00);color:#fff;',
+    'font-size:14px;font-weight:700;">Enter →</button>',
+    '</div>'
+  ].join('');
+
+  document.documentElement.appendChild(overlay);
+
+  var input = document.getElementById('gate-input');
+  var btn   = document.getElementById('gate-btn');
+  var err   = document.getElementById('gate-err');
+
+  // The actual password check — replace "zededa2026" with whatever you want
+  var PASSWORD = 'zededa2026';
+
+  function attempt() {
+    if (input.value === PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s';
+      setTimeout(function() { overlay.remove(); }, 300);
+    } else {
+      err.textContent = 'Incorrect password. Try again.';
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  btn.addEventListener('click', attempt);
+  input.addEventListener('keydown', function(e) { if (e.key === 'Enter') attempt(); });
+  setTimeout(function() { input.focus(); }, 100);
+})();
+</script>
 
 <!-- NAV -->
 <nav class="top-nav">
